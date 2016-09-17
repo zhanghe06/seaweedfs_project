@@ -19,7 +19,22 @@ $ sudo vim /etc/profile
 $ source /etc/profile
 ```
 
+或者仅为当前用户设置环境变量
+```
+$ vim ~/.bashrc
+$ source ~/.bashrc
+```
+
+注意：使用 zsh 的用户, 需要为 zsh 设置环境变量
+```
+$ vim ~/.zshrc
+$ source ~/.zshrc
+```
+
 ### Weed
+
+依赖 git (版本控制工具)
+
 ```
 go get github.com/chrislusf/seaweedfs/weed
 ```
