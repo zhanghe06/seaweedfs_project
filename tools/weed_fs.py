@@ -38,12 +38,12 @@ def save_file(file_path):
     {"name":"test.csv","size":425429}
     """
     assign = _get_assign()
-    url = '%s/%s' % (assign['url'], assign['fid'])
+    url = 'http://%s/%s' % (assign['url'], assign['fid'])
     res = requests.post(url, files={'file': open(file_path, 'rb')})
     return res.json()
 
 
-def get_file_path(fid, separator=None):
+def get_file_url(fid, separator=None):
     """
     获取文件路径
     """
@@ -53,5 +53,5 @@ def get_file_path(fid, separator=None):
 
 
 if __name__ == '__main__':
-    print get_file_path('1,014e123ade')
-    print get_file_path('1,014e123ade', '/')
+    print get_file_url('1,014e123ade')
+    print get_file_url('1,014e123ade', '/')
