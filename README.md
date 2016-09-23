@@ -55,6 +55,10 @@ $ weed volume -dir="/tmp/data1" -max=5  -mserver="localhost:9333" -port=8080 &
 $ weed volume -dir="/tmp/data2" -max=10 -mserver="localhost:9333" -port=8081 &
 ```
 
+```
+$ weed volume -dir=/tmp/data1/ -mserver="localhost:9333" -ip="192.168.2.32" -port=8080
+```
+
 上传文件请求
 ```
 $ curl http://localhost:9333/dir/assign
