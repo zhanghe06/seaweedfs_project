@@ -11,6 +11,7 @@
 
 from config import WEED_FS
 import requests
+import csv
 
 
 def _get_assign():
@@ -59,13 +60,11 @@ def read_csv(fid, encoding=None):
     :param encoding: 'gbk'/'utf-8'
     :return:
     """
-    import urllib2
-    import csv
     file_url = get_file_url(fid)
-    csv_file = urllib2.urlopen(file_url)
-    csv_reader = csv.reader(csv_file)
-    for line in csv_reader:
-        line = [item.decode(encoding) if encoding else item for item in line]
+    download = requests.get(file_url)
+    csv_rows = csv.reader(download.iter_lines(), delimiter=',', quotechar='"')
+    for csv_row in csv_rows:
+        line = [item.decode(encoding, 'ignore') if encoding else item for item in csv_row]
         yield line
 
 
