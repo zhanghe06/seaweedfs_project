@@ -8,7 +8,7 @@
 @time: 16-9-18 上午10:41
 """
 
-
+from config import REQUESTS_TIME_OUT
 from config import WEED_FS
 import requests
 import csv
@@ -17,10 +17,16 @@ import csv
 def _get_assign():
     """
     获取分配的资源（url fid）
-    {"fid":"1,014e123ade","url":"127.0.0.1:8080","publicUrl":"127.0.0.1:8080","count":1}
+    正确:
+        {"fid":"1,014e123ade","url":"127.0.0.1:8080","publicUrl":"127.0.0.1:8080","count":1}
+    错误:
+        {"error":"No free volumes left!"}
     """
     url = '%s/dir/assign' % WEED_FS
-    return requests.get(url).json()
+    res = requests.get(url, timeout=REQUESTS_TIME_OUT).json()
+    if 'error' in res:
+        raise Exception(res['error'])
+    return res
 
 
 def _get_locations(fid):
@@ -30,7 +36,7 @@ def _get_locations(fid):
     """
     volume_id = fid.split(',')[0]
     url = '%s/dir/lookup?volumeId=%s' % (WEED_FS, volume_id)
-    return requests.get(url).json()
+    return requests.get(url, timeout=REQUESTS_TIME_OUT).json()
 
 
 def save_file(file_path):
@@ -40,7 +46,7 @@ def save_file(file_path):
     """
     assign = _get_assign()
     url = 'http://%s/%s' % (assign['url'], assign['fid'])
-    res = requests.post(url, files={'file': open(file_path, 'rb')})
+    res = requests.post(url, files={'file': open(file_path, 'rb')}, timeout=REQUESTS_TIME_OUT)
     return dict(res.json(), **assign)
 
 
@@ -61,7 +67,7 @@ def read_csv(fid, encoding=None):
     :return:
     """
     file_url = get_file_url(fid)
-    download = requests.get(file_url)
+    download = requests.get(file_url, timeout=REQUESTS_TIME_OUT)
     csv_rows = csv.reader(download.iter_lines(), delimiter=',', quotechar='"')
     for csv_row in csv_rows:
         line = [item.decode(encoding, 'ignore') if encoding else item for item in csv_row]

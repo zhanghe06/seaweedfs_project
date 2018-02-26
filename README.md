@@ -14,7 +14,7 @@ $ wget https://storage.googleapis.com/golang/go1.7.1.linux-amd64.tar.gz
 $ sudo tar -C /usr/local -xzf go1.7.1.linux-amd64.tar.gz
 $ sudo vim /etc/profile
     export GOROOT=/usr/local/go
-    export GOPATH=$HOME/code/golang
+    export GOPATH=$HOME/work
     export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 $ source /etc/profile
 ```
@@ -59,6 +59,21 @@ $ weed volume -dir="/tmp/data2" -max=10 -mserver="localhost:9333" -port=8081 &
 $ weed volume -dir=/tmp/data1/ -mserver="localhost:9333" -ip="192.168.2.32" -port=8080
 ```
 
+
+## 启动（方式二）
+```
+$ weed server -dir=/tmp/data1/ -filer -filer.port=8000 -master.port=9333 -volume.port=8001 -volume.max=32
+```
+集群管理: http://127.0.0.1:9333/
+
+卷积管理: http://localhost:8001/ui/index.html
+
+归档管理: http://localhost:8000/
+
+注意: 每个卷最大支持32GB [seaweedfs storage-size](https://github.com/chrislusf/seaweedfs/#storage-size), 合理设置`volume.max`
+
+-volume.max=32 就表示最大支持1TB
+
 上传文件请求
 ```
 $ curl http://localhost:9333/dir/assign
@@ -79,7 +94,7 @@ $ curl -X DELETE http://127.0.0.1:8080/2,055a54a8ec
 
 文件读取
 ```
-curl "http://localhost:9333/dir/lookup?volumeId=2"
+$ curl "http://localhost:9333/dir/lookup?volumeId=2"
 {"volumeId":"2","locations":[{"url":"127.0.0.1:8080","publicUrl":"127.0.0.1:8080"}]}
 ```
 
@@ -89,3 +104,28 @@ curl "http://localhost:9333/dir/lookup?volumeId=2"
 - [http://127.0.0.1:8080/2/055a54a8ec](http://127.0.0.1:8080/2/055a54a8ec)
 - [http://127.0.0.1:8080/2/055a54a8ec?height=200&width=200](http://127.0.0.1:8080/2/055a54a8ec?height=200&width=200)
 
+
+导出文件打包
+```
+$ weed export -dir=/tmp/data1 -volumeId=1 -o=/tmp/data1.tar -fileNameFormat={{.Name}} -newer='2006-01-02T15:04:05'
+```
+
+解包具体文件
+```
+$ tar -xvf data1.tar
+```
+
+
+## 快速安装
+```
+# Mac系统
+$ wget -c https://github.com/chrislusf/seaweedfs/releases/download/0.76/darwin_amd64.tar.gz -O weed_darwin_arm64.tar.gz
+$ tar -zxvf weed_darwin_arm64.tar.gz
+
+# Linux系统
+$ wget -c https://github.com/chrislusf/seaweedfs/releases/download/0.76/linux_arm64.tar.gz -O weed_linux_arm64.tar.gz
+$ tar -zxvf weed_linux_arm64.tar.gz
+
+# 启动
+$ ./weed server -dir=weed_data/ -filer -filer.port=8000 -master.port=9333 -volume.port=8001 -volume.max=32
+```
